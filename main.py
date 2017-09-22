@@ -8,20 +8,26 @@ from pygame import *
 from constant import *
 from mob import *
 from walls import *
+from towers import *
+from projective import *
 
+screen = pygame.display.set_mode(DISPLAY)
 
 def main():
 
     pygame.init()                                       #Инициализация PyGame
-    hero = Player(100, 100)  # создаем героя по (x,y) координатам
+    hero = Player(-20, 70)  # создаем героя по (x,y) координатам
+
     left = right = up = down = False  # по умолчанию — стоим
+
 
     timer = pygame.time.Clock()
     screen = pygame.display.set_mode(DISPLAY)           #Создаем окошко
     pygame.display.set_caption("Tower Defense")         #Пищем щапку
-    bg = Surface((WIN_WIDTH, WIN_HEIGHT))               #Создание видимокй поверхности
     bgFlor = pygame.sprite.Group()
     entities = pygame.sprite.Group()
+    towers = pygame.sprite.Group()
+
     entities.add(hero)  # Все объекты
     x = y = 0       # Начинаем отрисовку с 0 координат
 
@@ -37,8 +43,7 @@ def main():
         x = 0
 
     platforms = []                                      # то, во что мы будем врезаться или опираться
-                                                        #Будем ее как фон
-    # bg.fill(Color(BACKGROUND_COLOR))                    #Заливаем ее одним цветом
+                                                    #Будем ее как фон
 
     x = y = 0
     for row in Wall:
@@ -50,6 +55,20 @@ def main():
                 entities.add(pf)
                 # Создаем блок разкрашиваем его цветом
                 platforms.append(pf)
+
+            x += PLATFORM_WIDTH
+        y += PLATFORM_HEIGHT
+        x = 0
+
+
+    x = y = 0
+    for row in tower:
+        for col in row:
+
+            if col != 0:
+
+                tow = Tower(x+21, y+17)
+                towers.add(tow)
 
             x += PLATFORM_WIDTH
         y += PLATFORM_HEIGHT
@@ -82,12 +101,18 @@ def main():
             if e.type == KEYUP and e.key == K_DOWN:
                 down = False
 
-        # screen.blit(bg, (0, 0))
+
+        heroPos = hero.getPos()
+
+
         hero.update(left, right, up, down, platforms)  # передвижение
+        towers.update(screen, heroPos)
+
         bgFlor.draw(screen)
         entities.draw(screen)  # отображение всего
 
-        # screen.blit(bg, (0,0)) #Каждую интерацию надо все перересовывать
+        towers.draw(screen)
+
         pygame.display.update() #Обновление и вывод всех изменений на экран
 
 

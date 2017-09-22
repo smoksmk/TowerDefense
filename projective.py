@@ -9,59 +9,40 @@ from constant import *
 
 
 
-class Player(sprite.Sprite):
+class Projectiv(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
-        self.mobSptrite = renderMob()
+        self.shootSptrite = Shoot()
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.yvel = 0
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
         self.startY = y
-
+        self.i = 0
 
         self.image = Surface((WIDTH, HEIGHT))
-        self.image = self.mobSptrite.getMobTiles(2)
+        self.image = self.shootSptrite.getshootTiles()
 
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
+
 
     def getPos(self):
         self.rect = self.image.get_rect(center=self.rect.center)
         return self.rect.x, self.rect.y
 
 
-
-    def update(self, left, right, up, down, platforms):
-        if left:
-            self.xvel = -MOVE_SPEED  # Лево = x- n
-            self.image = self.mobSptrite.getMobTiles(LEFT)
-
-        if right:
-            self.xvel = MOVE_SPEED  # Право = x + n
-            self.image = self.mobSptrite.getMobTiles(RIGHT)
-
-        if up:
-            self.yvel = -MOVE_SPEED  # Вверх = x- n
-            self.image = self.mobSptrite.getMobTiles(UP)
-        if down:
-            self.yvel = MOVE_SPEED  # Вниз = x + n
-            self.image = self.mobSptrite.getMobTiles(DOWN)
-
-        if not (left or right):  # стоим, когда нет указаний идти
-            self.xvel = 0
-
-        if not (up or down):
-            self.yvel = 0
-
+    def update(self):
+       # self.rect.x += 1
+       # self.rect.y += 1
 
         self.rect.y += self.yvel
-        self.collide(0, self.yvel, platforms)
-
         self.rect.x += self.xvel  # переносим свои положение на xvel
-        self.collide(self.xvel, 0, platforms)
+
 
 
     def draw(self, screen):  # Выводим себя на экран
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+
+        screen.blit(self.image, self.rect)
+
 
     def collide(self, xvel, yvel, platforms):
         for p in platforms:
@@ -82,23 +63,24 @@ class Player(sprite.Sprite):
                     self.rect.top = p.rect.bottom  # то не движется вверх
                     self.yvel = 0  # и энергия прыжка пропадает
 
+    def rotate(self, angle):
+
+        self.image = pygame.transform.rotate(self.image, angle)
 
 
-class renderMob(sprite.Sprite):
+class Shoot(sprite.Sprite):
     def __init__(self):
         self.tiles = "data/tank.gif"
-        self.tilesSize = [594, 265]
+        self.tilesSize = [0, 32]
         self.tecsturiesSize = [32, 32]
         self.images = []
         self.counts = 0
         temp = pygame.image.load(self.tiles).convert_alpha()
-        for y in range(1, 264, 33):
-            imagesTails = []
-            for x in range(330,559,33):
-                imagesTails.append(temp.subsurface(x+1, y, self.tecsturiesSize[0], self.tecsturiesSize[1]))
-            self.images.append(imagesTails)
 
-    def getMobTiles(self, vektor):
-        self.counts +=1
-        if self.counts == 7: self.counts = 0
-        return self.images[vektor][self.counts]
+        self.images.append(temp.subsurface(100, 1, self.tecsturiesSize[0], self.tecsturiesSize[1]))
+
+
+    def getshootTiles(self):
+
+        return self.images[0]
+
