@@ -88,14 +88,14 @@ class renderMob(sprite.Sprite):
     def __init__(self):
         self.tiles = "data/tank.gif"
         self.tilesSize = [594, 265]
-        self.tecsturiesSize = [32, 32]
+        self.tecsturiesSize = [24, 24]
         self.images = []
         self.counts = 0
         temp = pygame.image.load(self.tiles).convert_alpha()
-        for y in range(1, 264, 33):
+        for y in range(2, 264, 33):
             imagesTails = []
             for x in range(330,559,33):
-                imagesTails.append(temp.subsurface(x+1, y, self.tecsturiesSize[0], self.tecsturiesSize[1]))
+                imagesTails.append(temp.subsurface(x+4, y+4, self.tecsturiesSize[0], self.tecsturiesSize[1]))
             self.images.append(imagesTails)
 
     def getMobTiles(self, vektor):

@@ -12,7 +12,7 @@ from projective import *
 class Tower(sprite.Sprite):
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
-        self.timer = pygame.time.Clock()
+
         self.mobSptrite = renderTower()
         self.xvel = 0  # скорость перемещения. 0 - стоять на месте
         self.startX = x  # Начальная позиция Х, пригодится когда будем переигрывать уровень
@@ -24,34 +24,35 @@ class Tower(sprite.Sprite):
         self.distanse = 128
         self.oldAngle = self.angle
         self.image = Surface((WIDTH, HEIGHT))
-        self.shoots = []
-        self.projectiv = Projectiv(self.startX, self.startY)
+        self.speed = 150
+        self.oldSpeed = pygame.time.get_ticks()
+        self.shoots = pygame.sprite.Group()
 
         self.image = self.mobSptrite.getMobPosisn(self.angle)
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
 
 
 
-    def update(self, screen, enemyPos):
+    def update(self, screen, enemyPos, shoots, enemys):
+
+
 
         if abs(self.startX - enemyPos[0]) < self.distanse and abs(self.startY - enemyPos[1]) < self.distanse:
             self.angle = self.getangleToEnemy(enemyPos)
-            if len(self.shoots)<1:
-                print "shoot"
+            if len(self.shoots) < 5 and self.oldSpeed + self.speed < pygame.time.get_ticks():
+                self.projectiv = Projectiv(self.startX, self.startY)
                 self.projectiv.rotate(self.angle+90)
-                self.shoots.append(self.projectiv)
-                print self.shoots
-            # print self.projectiv.getPos()
-            if self.projectiv.getPos() > (self.startX+200, self.startY+200):
-                print "remove"
-                self.shoots.remove(0)
+                self.shoots.add(self.projectiv)
+                self.oldSpeed = pygame.time.get_ticks()
+                shoots.add(self.shoots)
 
-            self.projectiv.update()
-            self.projectiv.draw(screen)
             self.angle = self.getangleToEnemy(enemyPos)
             self.image = self.mobSptrite.getMobPosisn(self.angle)
             self.rect = self.image.get_rect(center=self.rect.center)
+
             screen.blit(self.image, self.rect)
+
+        shoots.update(screen, enemys)
 
 
 

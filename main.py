@@ -27,8 +27,11 @@ def main():
     bgFlor = pygame.sprite.Group()
     entities = pygame.sprite.Group()
     towers = pygame.sprite.Group()
-
+    shoots = pygame.sprite.Group()
     entities.add(hero)  # Все объекты
+    enemys = []
+    enemys.append(hero)
+
     x = y = 0       # Начинаем отрисовку с 0 координат
 
     for row in flor:
@@ -75,6 +78,7 @@ def main():
         x = 0
 
 
+
     while 1:
         timer.tick(60)
         for e in pygame.event.get():
@@ -106,12 +110,16 @@ def main():
 
 
         hero.update(left, right, up, down, platforms)  # передвижение
-        towers.update(screen, heroPos)
+        towers.update(screen, heroPos, shoots, enemys)
 
         bgFlor.draw(screen)
         entities.draw(screen)  # отображение всего
 
         towers.draw(screen)
+        shoots.draw(screen)
+        #print len(shoots)
+
+
 
         pygame.display.update() #Обновление и вывод всех изменений на экран
 

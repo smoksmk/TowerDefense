@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #Импортируем библиотеку pygame
-import pygame
+import pygame, math
 
 from pygame import *
 from constant import *
@@ -21,27 +21,36 @@ class Projectiv(sprite.Sprite):
 
         self.image = Surface((WIDTH, HEIGHT))
         self.image = self.shootSptrite.getshootTiles()
-
+        self.maxRadius = 128
         self.rect = Rect(x, y, WIDTH, HEIGHT)  # прямоугольный объект
-
+        self.speed = 1
+        self.oldtime = pygame.time.get_ticks()
+        self.radius = 6
+        self.angle = 0
 
     def getPos(self):
         self.rect = self.image.get_rect(center=self.rect.center)
         return self.rect.x, self.rect.y
 
 
-    def update(self):
-       # self.rect.x += 1
-       # self.rect.y += 1
+    def update(self, screen, enemyPos):
 
-        self.rect.y += self.yvel
-        self.rect.x += self.xvel  # переносим свои положение на xvel
-
+        if pygame.time.get_ticks() > self.speed + self.oldtime:
+            x = self.startX + self.radius * math.cos(math.radians(90-self.angle))
+            y = self.startY + self.radius * math.sin(math.radians(90-self.angle))
 
 
-    def draw(self, screen):  # Выводим себя на экран
+            self.rect.x = x
+            self.rect.y = y
+            self.radius += 1
+            self.oldtime = pygame.time.get_ticks()
 
-        screen.blit(self.image, self.rect)
+
+        if self.radius == self.maxRadius or sprite.collide_rect(self, enemyPos[0]):
+            self.kill()
+        else:
+            screen.blit(self.image, self.rect)
+
 
 
     def collide(self, xvel, yvel, platforms):
@@ -64,7 +73,7 @@ class Projectiv(sprite.Sprite):
                     self.yvel = 0  # и энергия прыжка пропадает
 
     def rotate(self, angle):
-
+        self.angle = angle
         self.image = pygame.transform.rotate(self.image, angle)
 
 
@@ -72,12 +81,12 @@ class Shoot(sprite.Sprite):
     def __init__(self):
         self.tiles = "data/tank.gif"
         self.tilesSize = [0, 32]
-        self.tecsturiesSize = [32, 32]
+        self.tecsturiesSize = [5, 7]
         self.images = []
         self.counts = 0
         temp = pygame.image.load(self.tiles).convert_alpha()
 
-        self.images.append(temp.subsurface(100, 1, self.tecsturiesSize[0], self.tecsturiesSize[1]))
+        self.images.append(temp.subsurface(114, 13, self.tecsturiesSize[0], self.tecsturiesSize[1]))
 
 
     def getshootTiles(self):
